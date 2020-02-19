@@ -1,20 +1,19 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Verify Email</title>
+    <title>Game Of Troves</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'b.css' %}">
 </head>
 <body>
-We've sent a verification email to {{ email }}. Please enter the verification code below.
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="code">
-    <input type="submit" value="submit">
 
-</form>
-<form method="post" action="{% url 'contest:resend_email' %}">
-    {% csrf_token %}
-    <input type="submit" value="Resend Email">
-</form>
+<div class="form">
+    <p style="text-align:center;color:#FFFFFF;font-weight:100;"> We've sent a verification email to {{ email }}. Please follow the link in the mail to verify your account.</p>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="resend_email" value="true">
+        <input type="submit" class="button button-block" value="Resend Email">
+    </form>
+</div>
 </body>
 </html>

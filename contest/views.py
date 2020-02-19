@@ -10,6 +10,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, reverse, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
+from threading import Thread
+from functools import partial
 
 from .decorators import verification_required
 from .forms import NewUserForm, AnswerForm, LoginForm
@@ -113,10 +116,13 @@ def ques(request):
 @require_http_methods(['GET', 'POST'])
 def loginview(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('contest:question'))
+        if request.user.is_active:
+            return HttpResponseRedirect(reverse('contest:question'))
+        else:
+            return HttpResponseRedirect(reverse('contest:verify'))
 
     if request.method == 'GET':
-        return render(request, 'contest/login.html', context={'form':LoginForm()})
+        return render(request, 'contest/login.html', context={'form': LoginForm()})
     else:
         form = LoginForm(request, request.POST)
         if form.is_valid():
@@ -132,36 +138,21 @@ def loginview(request):
 @require_http_methods(['GET', 'POST'])
 def signup(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('contest:index'))
+        return HttpResponseRedirect(reverse('contest:question'))
 
     if request.method == 'POST':
-        print("Request is post")
         form = NewUserForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            user.is_active = False
-            user.save()
-            login(request, user)
-            act = ActivationModel.objects.create(contestant=user)
+            contestant = form.save()
+            contestant.is_active = False
+            contestant.save()
+            login(request, contestant)
+            act = ActivationModel.objects.create(contestant=contestant)
+            activation_util(request)
             return HttpResponseRedirect(reverse('contest:verify'))
-            # try:
-            #     send_mail(
-            #         "Verification Code",
-            #         f"Your verification code is {act.hash}.",
-            #         "ankit@neodrishti.com",
-            #         [user.email],
-            #         fail_silently=False
-            #     )
-            #     return HttpResponseRedirect(reverse('contest:verify'))
-            # except SMTPException:
-            #     HttpResponse("Couldn't send email")
         else:
             render(request, 'contest/signup.html', {'form': form})
     else:
-
-
-    # form = NewUserForm()
-    # return render(request, 'contest/signup.html', {'form': form})
         return render(request, 'contest/signup.html', {'form': NewUserForm()})
 
 @verification_required
@@ -183,22 +174,45 @@ def logoutview(request):
     return HttpResponseRedirect(reverse('contest:index'))
 
 
+# @login_required
+# def verifyview(request):
+#     if request.user.is_active:
+#         return HttpResponseRedirect(reverse('contest:index'))
+#
+#     if request.method == 'GET':
+#         return render(request, 'contest/verify.html', {'email': request.user.email})
+#     else:
+#         code = request.POST.get('code')
+#         act = ActivationModel.objects.get(hash=code)
+#         if act:
+#             act.contestant.is_active = True
+#             act.contestant.save()
+#             return HttpResponseRedirect(reverse('contest:index'))
+#         else:
+#             return HttpResponse('Invalid Code')
+
+
 @login_required
+@require_http_methods(['GET', 'POST'])
 def verifyview(request):
     if request.user.is_active:
-        return HttpResponseRedirect(reverse('contest:index'))
+        return HttpResponseRedirect(reverse('contest:question'))
 
-    if request.method == 'GET':
-        return render(request, 'contest/verify.html', {'email': request.user.email})
+    if request.method == 'POST':
+        resend = request.POST.get('resend_email')
+        if resend:
+            activation_util(request)
     else:
-        code = request.POST.get('code')
-        act = ActivationModel.objects.get(hash=code)
-        if act:
-            act.contestant.is_active = True
-            act.contestant.save()
-            return HttpResponseRedirect(reverse('contest:index'))
-        else:
-            return HttpResponse('Invalid Code')
+        hashcode = request.GET.get('h')
+        if hashcode:
+            model = ActivationModel.objects.filter(hash=hashcode)
+            if model:
+                contestant = model[0].contestant
+                contestant.is_active = True
+                contestant.save()
+                return HttpResponseRedirect(reverse('contest:question'))
+
+    return render(request, 'contest/verify.html', {'email': request.user.email })
 
 
 @login_required
@@ -219,6 +233,31 @@ def resend_email(request):
     except SMTPException:
         HttpResponse("Couldn't send email")
 
+def activation_util(request):
+    contestant = request.user.contestant
+    email = contestant.email
+    hashcode = ActivationModel.objects.get(contestant=contestant).hash
+    url = settings.ALLOWED_HOSTS[0] + '/verify/?h=' + hashcode
+    t = Thread(target=partial(send_verification_email, receiver=email, url=url))
+    t.start()
+
+def send_verification_email(receiver, url):
+    send_mail(
+        "Verify account",
+        "Thank you for signing up for NeoDrishti Game of Troves.\n\n"
+        "Please follow the link below to verify your account.\n\n" + url,
+        "ankit@neodrishti.com",
+        [receiver],
+        fail_silently=False,
+        html_message=f'''
+            <html>
+                <body>
+                    Thank you for signing up for NeoDrishti Game of Troves. <br><br>
+                    Please follow the link below to verify your account. <br><br> {url}
+                </body>
+            </html>
+        '''
+    )
 
 def api(request, id):
     if id:

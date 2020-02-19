@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
-
 class Question(models.Model):
     number = models.IntegerField()
     text = models.TextField(max_length=1500)
@@ -65,14 +64,14 @@ class Hint(models.Model):
 def generate_random_string():
     chars = 'abcdefghijklmnopqrstuvwxyz1234567890'
     random_str = ''
-    for i in range(10):
+    for i in range(30):
         random_str += random.choice(chars)
 
     return random_str
 
 
 class AbstractHashModel(models.Model):
-    hash = models.CharField(default=generate_random_string, max_length=10)
+    hash = models.CharField(default=generate_random_string, max_length=30)
     contestant = models.ForeignKey(Contestant, on_delete=models.CASCADE)
 
     def __str__(self):
