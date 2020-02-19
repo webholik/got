@@ -10,8 +10,8 @@ urlpatterns = [
     path('questions/', views.ques, name='question'),
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('logout/', views.logoutview, name='logout'),
-    path('verify/', views.verifyview, name='verify'),
-    path('resend_email/', views.resend_email, name='resend_email'),
+    path('verify/', views.verify_view, name='verify'),
+    # path('resend_email/', views.resend_email, name='resend_email'),
     path('rules/', views.rules, name='rules'),
     # path('api/<int:id>', views.api, name='api'),
 ]

@@ -1,27 +1,25 @@
-import json
+import logging
+from functools import partial
 from smtplib import SMTPException
+from threading import Thread
 
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, reverse, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
-from django.conf import settings
-from threading import Thread
-from functools import partial
-import logging
-from smtplib import SMTPException
 
 from .decorators import verification_required
 from .forms import NewUserForm, AnswerForm, LoginForm
 from .models import Question, Answer, Contestant, ActivationModel
 
-
 logger = logging.getLogger('got')
+
 
 # Create your views here.
 # @login_required
@@ -110,12 +108,13 @@ def handle_answer(request):
 
 @verification_required
 def ques(request):
-    context = {}
-    context['questions'] = Question.objects.all()
-    context['answer_form'] = AnswerForm()
-    context['contestant'] = request.user.contestant
+    context = {
+        'questions': Question.objects.all(),
+        'answer_form': AnswerForm(),
+        'contestant': request.user.contestant
+    }
     if request.method == 'POST':
-            context['error_no'] = handle_answer(request)
+        context['error_no'] = handle_answer(request)
 
     return render(request, 'contest/questions.html', context)
 
@@ -139,7 +138,7 @@ def loginview(request):
             else:
                 return HttpResponseRedirect(reverse('contest:verify'))
         else:
-            return render(request, 'contest/login.html', context={'form':form})
+            return render(request, 'contest/login.html', context={'form': form})
 
 
 @require_http_methods(['GET', 'POST'])
@@ -169,9 +168,10 @@ def leaderboard(request):
     paginator = Paginator(contestants, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    context = {}
-    context['page_obj'] = page_obj
-    context['start_num'] = (page_obj.number - 1) * 10
+    context = {
+        'page_obj': page_obj,
+        'start_num': (page_obj.number - 1) * 10
+    }
     return render(request, 'contest/leader.html', context=context)
 
 
@@ -202,7 +202,7 @@ def logoutview(request):
 
 @login_required
 @require_http_methods(['GET', 'POST'])
-def verifyview(request):
+def verify_view(request):
     if request.user.is_active:
         return HttpResponseRedirect(reverse('contest:question'))
 
@@ -220,26 +220,26 @@ def verifyview(request):
                 contestant.save()
                 return HttpResponseRedirect(reverse('contest:question'))
 
-    return render(request, 'contest/verify.html', {'email': request.user.email })
+    return render(request, 'contest/verify.html', {'email': request.user.email})
 
 
-@login_required
-def resend_email(request):
-    if request.user.is_active:
-        return HttpResponseRedirect(reverse('contest:index'))
-
-    act = ActivationModel.objects.get(contestant=request.user)
-    try:
-        send_mail(
-            "Verification Code",
-            f"Your verification code is {act.hash}.",
-            "ankit@neodrishti.com",
-            [request.user.email],
-            fail_silently=False
-        )
-        return HttpResponseRedirect(reverse('contest:verify'))
-    except SMTPException:
-        HttpResponse("Couldn't send email")
+# @login_required
+# def resend_email(request):
+#     if request.user.is_active:
+#         return HttpResponseRedirect(reverse('contest:index'))
+#
+#     act = ActivationModel.objects.get(contestant=request.user)
+#     try:
+#         send_mail(
+#             "Verification Code",
+#             f"Your verification code is {act.hash}.",
+#             "ankit@neodrishti.com",
+#             [request.user.email],
+#             fail_silently=False
+#         )
+#         return HttpResponseRedirect(reverse('contest:verify'))
+#     except SMTPException:
+#         HttpResponse("Couldn't send email")
 
 def activation_util(request):
     contestant = request.user.contestant
@@ -248,6 +248,7 @@ def activation_util(request):
     url = settings.ALLOWED_HOSTS[0] + '/verify/?h=' + hashcode
     t = Thread(target=partial(send_verification_email, receiver=email, url=url))
     t.start()
+
 
 def send_verification_email(receiver, url):
     try:
@@ -271,17 +272,17 @@ def send_verification_email(receiver, url):
         logger.exception(e)
         logger.debug(e)
 
-def api(request, id):
-    if id:
-        question = Question.objects.get(pk=id)
-        data = {}
-        data['text'] = question.text
-        data['ans'] = question.correct_answer
-        return HttpResponse(json.dumps(data))
-    return HttpResponse('id not found')
+
+# def api(request, id):
+#     if id:
+#         question = Question.objects.get(pk=id)
+#         data = {}
+#         data['text'] = question.text
+#         data['ans'] = question.correct_answer
+#         return HttpResponse(json.dumps(data))
+#     return HttpResponse('id not found')
+
 
 @verification_required
 def rules(request):
     return render(request, 'contest/rules.html')
-
-

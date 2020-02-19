@@ -5,6 +5,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+
+class Contest(models.Model):
+    start_time = models.DateTimeField()
+
+
 class Question(models.Model):
     number = models.IntegerField()
     text = models.TextField(max_length=1500)
