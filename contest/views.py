@@ -13,11 +13,15 @@ from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from threading import Thread
 from functools import partial
+import logging
+from smtplib import SMTPException
 
 from .decorators import verification_required
 from .forms import NewUserForm, AnswerForm, LoginForm
 from .models import Question, Answer, Contestant, ActivationModel
 
+
+logger = logging.getLogger('got')
 
 # Create your views here.
 # @login_required
@@ -27,53 +31,54 @@ def index(request):
     return render(request, "contest/index.html")
 
 
-@verification_required
-@require_http_methods(['GET', 'POST'])
-def question(request, id):
-    if request.method == 'GET':
-        context = {}
-        context['question'] = get_object_or_404(Question, number=id)
-        context['answer_form'] = AnswerForm()
-        return render(request, 'contest/question.html', context)
-
-    elif request.method == 'POST':
-        contestant = request.user.contestant
-        if contestant.answered_questions.filter(number=id):
-            return HttpResponseRedirect(reverse('contest:index'))
-
-        question = get_object_or_404(Question, number=id)
-        if (question.release_date > timezone.now()):
-            return HttpResponseRedirect(reverse('contest:index'))
-        answer_form = AnswerForm(request.POST)
-        if answer_form.is_valid():
-            answer = Answer(text=answer_form.cleaned_data['text'])
-            answer.time = timezone.now()
-            answer.contestant = contestant
-            answer.question = question
-            answer.save()
-            if answer.text == question.correct_answer:
-                contestant.answered_questions.add(question)
-                contestant.points += question.points
-                contestant.extra_time += answer.time - question.release_date
-                contestant.save()
-            else:
-                return render(request, 'contest/question.html', {
-                    'question': question,
-                    'answer_form': answer_form,
-                    'wrong_answer': True,
-                })
-
-            return HttpResponseRedirect(reverse('contest:index'))
-        else:
-            return HttpResponseRedirect(reverse('contest:question', args=[id]))
+# @verification_required
+# @require_http_methods(['GET', 'POST'])
+# def question(request, id):
+#     if request.method == 'GET':
+#         context = {}
+#         context['question'] = get_object_or_404(Question, number=id)
+#         context['answer_form'] = AnswerForm()
+#         return render(request, 'contest/question.html', context)
+#
+#     elif request.method == 'POST':
+#         contestant = request.user.contestant
+#         if contestant.answered_questions.filter(number=id):
+#             return HttpResponseRedirect(reverse('contest:index'))
+#
+#         question = get_object_or_404(Question, number=id)
+#         if (question.release_date > timezone.now()):
+#             return HttpResponseRedirect(reverse('contest:index'))
+#         answer_form = AnswerForm(request.POST)
+#         if answer_form.is_valid():
+#             answer = Answer(text=answer_form.cleaned_data['text'])
+#             answer.time = timezone.now()
+#             answer.contestant = contestant
+#             answer.question = question
+#             answer.save()
+#             if answer.text == question.correct_answer:
+#                 contestant.answered_questions.add(question)
+#                 contestant.points += question.points
+#                 contestant.extra_time += answer.time - question.release_date
+#                 contestant.save()
+#             else:
+#                 return render(request, 'contest/question.html', {
+#                     'question': question,
+#                     'answer_form': answer_form,
+#                     'wrong_answer': True,
+#                 })
+#
+#             return HttpResponseRedirect(reverse('contest:index'))
+#         else:
+#             return HttpResponseRedirect(reverse('contest:question', args=[id]))
 
 
 class Login(LoginView):
     template_name = 'contest/login.html'
     redirect_authenticated_user = True
 
+
 def handle_answer(request):
-    ''' Return true if the answer is wrong '''
+    """ Return true if the answer is wrong """
     contestant = request.user.contestant
     number = request.POST.get('question_no')
     if not number:
@@ -102,6 +107,7 @@ def handle_answer(request):
     else:
         return question.number
 
+
 @verification_required
 def ques(request):
     context = {}
@@ -112,6 +118,7 @@ def ques(request):
             context['error_no'] = handle_answer(request)
 
     return render(request, 'contest/questions.html', context)
+
 
 @require_http_methods(['GET', 'POST'])
 def loginview(request):
@@ -154,6 +161,7 @@ def signup(request):
             render(request, 'contest/signup.html', {'form': form})
     else:
         return render(request, 'contest/signup.html', {'form': NewUserForm()})
+
 
 @verification_required
 def leaderboard(request):
@@ -242,22 +250,26 @@ def activation_util(request):
     t.start()
 
 def send_verification_email(receiver, url):
-    send_mail(
-        "Verify account",
-        "Thank you for signing up for NeoDrishti Game of Troves.\n\n"
-        "Please follow the link below to verify your account.\n\n" + url,
-        "ankit@neodrishti.com",
-        [receiver],
-        fail_silently=False,
-        html_message=f'''
-            <html>
-                <body>
-                    Thank you for signing up for NeoDrishti Game of Troves. <br><br>
-                    Please follow the link below to verify your account. <br><br> {url}
-                </body>
-            </html>
-        '''
-    )
+    try:
+        send_mail(
+            "Verify account",
+            "Thank you for signing up for NeoDrishti Game of Troves.\n\n"
+            "Please follow the link below to verify your account.\n\n" + url,
+            "ankit@neodrishti.com",
+            [receiver],
+            fail_silently=False,
+            html_message=f'''
+                <html>
+                    <body>
+                        Thank you for signing up for NeoDrishti Game of Troves. <br><br>
+                        Please follow the link below to verify your account. <br><br> {url}
+                    </body>
+                </html>
+            '''
+        )
+    except SMTPException as e:
+        logger.exception(e)
+        logger.debug(e)
 
 def api(request, id):
     if id:
