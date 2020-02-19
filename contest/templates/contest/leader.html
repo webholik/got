@@ -1,0 +1,61 @@
+{% extends 'contest/base.html' %}
+{% block title %}
+Leaderboard
+{% endblock %}
+{% block active_leaderboard %}
+active
+{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+{#                    <div class="card-header">#}
+{#                        <h4 class="card-title " style="text-align: center;"> LeaderBoard</h4>#}
+{#                    </div>#}
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class=" text-primary">
+                                <th>
+                                    Rank
+                                </th>
+                                <th>
+                                    Username
+                                </th>
+                                <th>
+                                    Points
+                                </th>
+                                <th class="text-right">
+                                    Time
+                                </th>
+                                </thead>
+                                <tbody>
+                                {% for user in page_obj %}
+                                    <tr>
+                                        <td>
+                                            {{ forloop.counter|add:start_num }}
+                                        </td>
+                                        <td>
+                                            {{ user.username }}
+                                        </td>
+                                        <td>
+                                            {{ user.points }}
+                                        </td>
+                                        <td class="text-right">
+                                            {{ user.get_extra_time }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+

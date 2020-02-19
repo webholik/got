@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Question</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body>
+
+{{ question.text }}
+
+<form method="post">
+{% csrf_token %}
+    {{ answer_form.text}}
+    {% if wrong_answer %}
+        <p> Wrong answer!</p>
+    {% endif %}
+    <input type="submit" value="submit">
+
+</form>
+
+</body>
+</html>

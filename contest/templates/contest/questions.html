@@ -1,0 +1,88 @@
+{% extends 'contest/base.html' %}
+
+{% load static %}
+{% block title %}
+Questions
+{% endblock %}
+{% block active_question %}
+active
+{% endblock %}
+      <!-- End Navbar -->
+      <!-- <div class="panel-header panel-header-lg">
+
+  <canvas id="bigDashboardChart"></canvas>
+
+
+</div> -->
+{% block content %}
+        <div class="content">
+            {% for question in questions %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card ">
+                            <div class="card-header ">
+{#                                <h5 class="card-title">Questions</h5>#}
+                                <p class="card-category">Q.{{ question.number }}</p>
+                            </div>
+                            <div class="card-body ">
+                                <h1>{{ question.text }}</h1>
+                                {% if question in contestant.answered_questions.all %}
+                                    <p> <span style="color:green">✔ </span>Answered</p>
+                                {% else %}
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="question_no" value="{{ question.number }}">
+                                    {{ answer_form.text }}
+                                    <input type="submit" value="submit" class="button-block">
+                                </form>
+                                    {% if error_no and error_no == question.number %}
+                                        <p style="color:red"> Wrong Answer!</p>
+                                    {% endif %}
+                                {% endif %}
+
+                            </div>
+                            <div class="card-footer ">
+                                <hr>
+                                <div class="stats">
+                                    <i class="fa fa-history"></i> Updated {{ question.time_since}} ago
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          {% endfor %}
+       
+      </div>
+{% endblock %}
+{#      <footer class="footer footer-black  footer-white ">#}
+{#        <div class="container-fluid">#}
+{#          <div class="row">#}
+{#            #}
+{#            <div class="credits ml-auto">#}
+{#              <span class="copyright">#}
+{#                ©#}
+{#                <script>#}
+{#                  document.write(new Date().getFullYear())#}
+{#                </script>, made with <i class="fa fa-heart heart"></i> by NEO-DRISHTI WEB TEAM#}
+{#              </span>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </footer>#}
+{#    </div>#}
+{#  </div>#}
+{#  <!--   Core JS Files   -->#}
+{#  <script src="{% static 'assets/js/core/jquery.min.js'%}"></script>#}
+{#  <script src="{% static 'assets/js/core/popper.min.js' %}"></script>#}
+{#  <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>#}
+{#  <script src="{% static 'assets/js/plugins/perfect-scrollbar.jquery.min.js' %}"></script>#}
+{#  <script src="{% static 'assets/js/paper-dashboard.min.js?v=2.0.0' %}" type="text/javascript"></script>#}
+{#  <script>#}
+{#    $(document).ready(function() {#}
+{#      // Javascript method's body can be found in assets/assets-for-demo/js/demo.js#}
+{#      demo.initChartsPages();#}
+{#    });#}
+{#  </script>#}
+{#</body>#}
+{##}
+{#</html>#}
