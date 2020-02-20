@@ -15,7 +15,7 @@ class Question(models.Model):
     text = models.TextField(max_length=1500)
     image = models.ImageField(blank=True)
     correct_answer = models.CharField(max_length=500)
-    release_date = models.DateTimeField()
+    # release_date = models.DateTimeField()
     points = models.IntegerField()
 
     def __str__(self):
@@ -43,7 +43,7 @@ class Contestant(User):
     college = models.CharField(max_length=500)
     points = models.IntegerField(default=0)
     extra_time = models.DurationField(default=timedelta(0))
-    answered_questions = models.ManyToManyField(Question)
+    answered_questions = models.ManyToManyField(Question, blank=True)
 
     def get_extra_time(self):
         hours, rest = divmod(self.extra_time.seconds, 3600)
@@ -57,6 +57,9 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     contestant = models.ForeignKey(Contestant, on_delete=models.CASCADE)
     time = models.DateTimeField()
+
+    def __str__(self):
+        return 'Answer'
 
 
 class Hint(models.Model):

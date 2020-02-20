@@ -16,58 +16,15 @@ from django.views.decorators.http import require_http_methods
 
 from .decorators import verification_required
 from .forms import NewUserForm, AnswerForm, LoginForm
-from .models import Question, Answer, Contestant, ActivationModel
+from .models import Question, Answer, Contestant, ActivationModel, Contest
 
 logger = logging.getLogger('got')
 
-
-# Create your views here.
-# @login_required
 def index(request):
     if request.user.is_active:
         return HttpResponseRedirect(reverse('contest:question'))
     return render(request, "contest/index.html")
 
-
-# @verification_required
-# @require_http_methods(['GET', 'POST'])
-# def question(request, id):
-#     if request.method == 'GET':
-#         context = {}
-#         context['question'] = get_object_or_404(Question, number=id)
-#         context['answer_form'] = AnswerForm()
-#         return render(request, 'contest/question.html', context)
-#
-#     elif request.method == 'POST':
-#         contestant = request.user.contestant
-#         if contestant.answered_questions.filter(number=id):
-#             return HttpResponseRedirect(reverse('contest:index'))
-#
-#         question = get_object_or_404(Question, number=id)
-#         if (question.release_date > timezone.now()):
-#             return HttpResponseRedirect(reverse('contest:index'))
-#         answer_form = AnswerForm(request.POST)
-#         if answer_form.is_valid():
-#             answer = Answer(text=answer_form.cleaned_data['text'])
-#             answer.time = timezone.now()
-#             answer.contestant = contestant
-#             answer.question = question
-#             answer.save()
-#             if answer.text == question.correct_answer:
-#                 contestant.answered_questions.add(question)
-#                 contestant.points += question.points
-#                 contestant.extra_time += answer.time - question.release_date
-#                 contestant.save()
-#             else:
-#                 return render(request, 'contest/question.html', {
-#                     'question': question,
-#                     'answer_form': answer_form,
-#                     'wrong_answer': True,
-#                 })
-#
-#             return HttpResponseRedirect(reverse('contest:index'))
-#         else:
-#             return HttpResponseRedirect(reverse('contest:question', args=[id]))
 
 
 class Login(LoginView):
@@ -78,10 +35,10 @@ class Login(LoginView):
 def handle_answer(request):
     """ Return true if the answer is wrong """
     contestant = request.user.contestant
-    number = request.POST.get('question_no')
+    number = request.POST.get('question_id')
     if not number:
         return
-    question = Question.objects.filter(number=number)
+    question = Question.objects.filter(pk=number)
     if not question:
         return
     question = question[0]
@@ -99,24 +56,30 @@ def handle_answer(request):
     if answer.text == question.correct_answer:
         contestant.answered_questions.add(question)
         contestant.points += question.points
-        contestant.extra_time += answer.time - question.release_date
+        contest = Contest.objects.get(pk=1)
+        contestant.extra_time += answer.time - contest.start_time
         contestant.save()
         return
     else:
-        return question.number
+        return True
 
 
 @verification_required
 def ques(request):
-    context = {
-        'questions': Question.objects.all(),
-        'answer_form': AnswerForm(),
-        'contestant': request.user.contestant
-    }
+    context = {}
     if request.method == 'POST':
-        context['error_no'] = handle_answer(request)
+        if handle_answer(request):
+            context['error'] = True
 
-    return render(request, 'contest/questions.html', context)
+    questions = Question.objects.all().order_by('number')
+    contestant = request.user.contestant
+    for q in questions:
+        if q not in contestant.answered_questions.all():
+            context['question'] = q
+            context['answer_form'] = AnswerForm()
+            return render(request, 'contest/questions.html', context)
+
+    return render(request, 'contest/questions.html')
 
 
 @require_http_methods(['GET', 'POST'])
@@ -164,13 +127,14 @@ def signup(request):
 
 @verification_required
 def leaderboard(request):
+    num = 20
     contestants = Contestant.objects.all().order_by('-points', 'extra_time')
-    paginator = Paginator(contestants, 10)
+    paginator = Paginator(contestants, num)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
         'page_obj': page_obj,
-        'start_num': (page_obj.number - 1) * 10
+        'start_num': (page_obj.number - 1) * num
     }
     return render(request, 'contest/leader.html', context=context)
 

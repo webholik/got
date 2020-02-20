@@ -16,9 +16,9 @@ active
 </div> -->
 {% block content %}
         <div class="content">
-            {% for question in questions %}
                 <div class="row">
                     <div class="col-md-12">
+                    {% if question %}
                         <div class="card ">
                             <div class="card-header ">
 {#                                <h5 class="card-title">Questions</h5>#}
@@ -31,58 +31,22 @@ active
                                 {% else %}
                                 <form method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" name="question_no" value="{{ question.number }}">
+                                    <input type="hidden" name="question_id" value="{{ question.id }}">
                                     {{ answer_form.text }}
                                     <input type="submit" value="submit" class="button-block">
                                 </form>
-                                    {% if error_no and error_no == question.number %}
+                                    {% if error %}
                                         <p style="color:red"> Wrong Answer!</p>
                                     {% endif %}
                                 {% endif %}
 
                             </div>
-                            <div class="card-footer ">
-                                <hr>
-                                <div class="stats">
-                                    <i class="fa fa-history"></i> Updated {{ question.time_since}} ago
-                                </div>
-                            </div>
                         </div>
+                        {% else %}
+                        <p> No more questions. </p>
+                    {% endif %}
                     </div>
                 </div>
-          {% endfor %}
-       
       </div>
 {% endblock %}
-{#      <footer class="footer footer-black  footer-white ">#}
-{#        <div class="container-fluid">#}
-{#          <div class="row">#}
-{#            #}
-{#            <div class="credits ml-auto">#}
-{#              <span class="copyright">#}
-{#                ©#}
-{#                <script>#}
-{#                  document.write(new Date().getFullYear())#}
-{#                </script>, made with <i class="fa fa-heart heart"></i> by NEO-DRISHTI WEB TEAM#}
-{#              </span>#}
-{#            </div>#}
-{#          </div>#}
-{#        </div>#}
-{#      </footer>#}
-{#    </div>#}
-{#  </div>#}
-{#  <!--   Core JS Files   -->#}
-{#  <script src="{% static 'assets/js/core/jquery.min.js'%}"></script>#}
-{#  <script src="{% static 'assets/js/core/popper.min.js' %}"></script>#}
-{#  <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>#}
-{#  <script src="{% static 'assets/js/plugins/perfect-scrollbar.jquery.min.js' %}"></script>#}
-{#  <script src="{% static 'assets/js/paper-dashboard.min.js?v=2.0.0' %}" type="text/javascript"></script>#}
-{#  <script>#}
-{#    $(document).ready(function() {#}
-{#      // Javascript method's body can be found in assets/assets-for-demo/js/demo.js#}
-{#      demo.initChartsPages();#}
-{#    });#}
-{#  </script>#}
-{#</body>#}
-{##}
-{#</html>#}
+

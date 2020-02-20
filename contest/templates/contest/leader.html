@@ -55,6 +55,12 @@ active
             </div>
 
         </div>
+    {% if page_obj.has_previous %}
+    <a href="{% url 'contest:leaderboard' %}?page={{ page_obj.previous_page_number }}"><button class="btn">Previous</button></a>
+    {% endif %}
+    {% if page_obj.has_next %}
+        <a href="{% url 'contest:leaderboard' %}?page={{ page_obj.next_page_number }}"><button class="btn">Next</button></a>
+    {% endif %}
     </div>
 {% endblock %}
 
