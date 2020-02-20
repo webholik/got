@@ -1,11 +1,11 @@
 import random
 from datetime import timedelta
 
+from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.contrib.auth.models import User
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser, UserManager
-from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 class Contest(models.Model):
@@ -17,8 +17,10 @@ class Question(models.Model):
     text = models.TextField(max_length=1500)
     image = models.ImageField(blank=True)
     correct_answer = models.CharField(max_length=500)
+    answer_description = models.TextField(blank=True)
     # release_date = models.DateTimeField()
     points = models.IntegerField()
+
 
     def __str__(self):
         return f"Question {self.number}"
@@ -107,19 +109,6 @@ class Contestant(AbstractBaseUser):
     def has_module_perms(self, app_label):
         print(f'has_module_perms called {app_label}')
         return self.is_staff
-
-
-# class Contestant(User):
-#     college = models.CharField(max_length=500)
-#     points = models.IntegerField(default=0)
-#     extra_time = models.DurationField(default=timedelta(0))
-#     answered_questions = models.ManyToManyField(Question, blank=True)
-#
-#     def get_extra_time(self):
-#         hours, rest = divmod(self.extra_time.seconds, 3600)
-#         hours += self.extra_time.days * 24
-#         minutes, seconds = divmod(rest, 60)
-#         return f'{hours}:{minutes}:{seconds}'
 
 
 class Answer(models.Model):
