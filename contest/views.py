@@ -20,21 +20,16 @@ from .models import Question, Answer, Contestant, ActivationModel, Contest
 
 logger = logging.getLogger('got')
 
+
 def index(request):
     if request.user.is_active:
         return HttpResponseRedirect(reverse('contest:question'))
     return render(request, "contest/index.html")
 
 
-
-class Login(LoginView):
-    template_name = 'contest/login.html'
-    redirect_authenticated_user = True
-
-
 def handle_answer(request):
     """ Return true if the answer is wrong """
-    contestant = request.user.contestant
+    contestant = request.user
     number = request.POST.get('question_id')
     if not number:
         return
@@ -72,7 +67,7 @@ def ques(request):
             context['error'] = True
 
     questions = Question.objects.all().order_by('number')
-    contestant = request.user.contestant
+    contestant = request.user
     for q in questions:
         if q not in contestant.answered_questions.all():
             context['question'] = q
@@ -120,7 +115,7 @@ def signup(request):
             activation_util(request)
             return HttpResponseRedirect(reverse('contest:verify'))
         else:
-            render(request, 'contest/signup.html', {'form': form})
+            return render(request, 'contest/signup.html', {'form': form})
     else:
         return render(request, 'contest/signup.html', {'form': NewUserForm()})
 
@@ -146,24 +141,6 @@ def logoutview(request):
     return HttpResponseRedirect(reverse('contest:index'))
 
 
-# @login_required
-# def verifyview(request):
-#     if request.user.is_active:
-#         return HttpResponseRedirect(reverse('contest:index'))
-#
-#     if request.method == 'GET':
-#         return render(request, 'contest/verify.html', {'email': request.user.email})
-#     else:
-#         code = request.POST.get('code')
-#         act = ActivationModel.objects.get(hash=code)
-#         if act:
-#             act.contestant.is_active = True
-#             act.contestant.save()
-#             return HttpResponseRedirect(reverse('contest:index'))
-#         else:
-#             return HttpResponse('Invalid Code')
-
-
 @login_required
 @require_http_methods(['GET', 'POST'])
 def verify_view(request):
@@ -187,26 +164,8 @@ def verify_view(request):
     return render(request, 'contest/verify.html', {'email': request.user.email})
 
 
-# @login_required
-# def resend_email(request):
-#     if request.user.is_active:
-#         return HttpResponseRedirect(reverse('contest:index'))
-#
-#     act = ActivationModel.objects.get(contestant=request.user)
-#     try:
-#         send_mail(
-#             "Verification Code",
-#             f"Your verification code is {act.hash}.",
-#             "ankit@neodrishti.com",
-#             [request.user.email],
-#             fail_silently=False
-#         )
-#         return HttpResponseRedirect(reverse('contest:verify'))
-#     except SMTPException:
-#         HttpResponse("Couldn't send email")
-
 def activation_util(request):
-    contestant = request.user.contestant
+    contestant = request.user
     email = contestant.email
     hashcode = ActivationModel.objects.get(contestant=contestant).hash
     url = settings.ALLOWED_HOSTS[0] + '/verify/?h=' + hashcode

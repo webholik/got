@@ -32,6 +32,7 @@ active
                                 </thead>
                                 <tbody>
                                 {% for user in page_obj %}
+                                    {% if user.username != 'admin' %}
                                     <tr>
                                         <td>
                                             {{ forloop.counter|add:start_num }}
@@ -46,6 +47,7 @@ active
                                             {{ user.get_extra_time }}
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                                 </tbody>
                             </table>

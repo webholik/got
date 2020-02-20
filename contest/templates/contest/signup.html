@@ -24,16 +24,10 @@
                     {{ form.username.label_tag }}
                     {{ form.username }}
                 </div>
-                <div class="top-row">
-                    <div class="field-wrap">
-                        {{ form.first_name.label_tag}}
-                        {{ form.first_name }}
-                    </div>
 
-                    <div class="field-wrap">
-                        {{ form.last_name.label_tag}}
-                        {{ form.last_name }}
-                    </div>
+                <div class="field-wrap">
+                    {{ form.name.label_tag }}
+                    {{ form.name }}
                 </div>
 
                 <div class="field-wrap">
@@ -59,8 +53,8 @@
                 <input type="submit" class="button button-block" value="Sign Up">
 
             </form>
-            {% if form.errors %}
-            {{ form.errors }}
+            {% if form.non_field_errors %}
+                {{ form.non_field_errors }}
             {% endif %}
 
         </div>
@@ -68,7 +62,7 @@
     </div><!-- tab-content -->
 
 </div> <!-- /form -->
-<script	src="{% static 'js/core/jquery.min.js' %}"></script>
+<script src="{% static 'js/core/jquery.min.js' %}"></script>
 <script src="{% static 'f.js' %}"></script>
 
 </body>

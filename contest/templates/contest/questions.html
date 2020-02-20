@@ -31,9 +31,9 @@ active
                                 {% else %}
                                 <form method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" name="question_id" value="{{ question.id }}">
+                                    <input type="hidden" name="question_id" value="{{ question.id }}" class="form-control border-input">
                                     {{ answer_form.text }}
-                                    <input type="submit" value="submit" class="button-block">
+                                    <input type="submit" value="submit" class="btn btn-info btn-fill btn-wd">
                                 </form>
                                     {% if error %}
                                         <p style="color:red"> Wrong Answer!</p>

@@ -4,6 +4,8 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 class Contest(models.Model):
@@ -39,17 +41,85 @@ class Question(models.Model):
             return ret
 
 
-class Contestant(User):
-    college = models.CharField(max_length=500)
+class CustomManager(UserManager):
+    def create_superuser(self, username, email, password, **extra_fields):
+        extra_fields.setdefault('is_active', True)
+        return super().create_superuser(username, email, password, **extra_fields)
+
+
+class Contestant(AbstractBaseUser):
+    username = models.CharField(
+        max_length=100,
+        unique=True,
+        primary_key=True,
+        validators=[UnicodeUsernameValidator()],
+        error_messages={
+            'unique': 'A contestant with that username already exists'
+        }
+    )
+
+    email = models.EmailField(
+        unique=True,
+        error_messages={
+            'unique': 'A contestant with that email already exists'
+        }
+    )
+
+    name = models.CharField(max_length=100)
+
+    is_active = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    date_joined = models.DateTimeField(default=timezone.now)
+
+    college = models.CharField(max_length=100)
     points = models.IntegerField(default=0)
     extra_time = models.DurationField(default=timedelta(0))
     answered_questions = models.ManyToManyField(Question, blank=True)
+
+    objects = CustomManager()
+
+    USERNAME_FIELD = 'username'
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['email']
 
     def get_extra_time(self):
         hours, rest = divmod(self.extra_time.seconds, 3600)
         hours += self.extra_time.days * 24
         minutes, seconds = divmod(rest, 60)
         return f'{hours}:{minutes}:{seconds}'
+
+    def get_full_name(self):
+        return self.name
+
+    def get_short_name(self):
+        return self.username
+
+    def clean(self):
+        super().clean()
+        self.email = UserManager.normalize_email(self.email)
+
+    def has_perm(self, perm, obj=None):
+        print(f'has_perm called with {perm} and obj={obj}')
+        return self.is_staff
+
+    def has_module_perms(self, app_label):
+        print(f'has_module_perms called {app_label}')
+        return self.is_staff
+
+
+# class Contestant(User):
+#     college = models.CharField(max_length=500)
+#     points = models.IntegerField(default=0)
+#     extra_time = models.DurationField(default=timedelta(0))
+#     answered_questions = models.ManyToManyField(Question, blank=True)
+#
+#     def get_extra_time(self):
+#         hours, rest = divmod(self.extra_time.seconds, 3600)
+#         hours += self.extra_time.days * 24
+#         minutes, seconds = divmod(rest, 60)
+#         return f'{hours}:{minutes}:{seconds}'
 
 
 class Answer(models.Model):

@@ -22,7 +22,7 @@ class NewUserForm(forms.ModelForm):
 
     class Meta:
         model = Contestant
-        fields = ['username', 'first_name', 'last_name', 'email', 'college']
+        fields = ['username', 'name', 'email', 'college']
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
