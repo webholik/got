@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Of Troves</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'b.css' %}">
+
+</head>
+<body>
+
+<div class="form">
+    {% block content %}
+    {% endblock %}
+</div> <!-- /form -->
+<script src="{% static 'js/core/jquery.min.js' %}"></script>
+<script src="{% static 'f.js' %}"></script>
+
+</body>
+</html>

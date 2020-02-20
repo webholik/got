@@ -1,13 +1,5 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Game Of Troves</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'b.css' %}">
-</head>
-<body>
-
-<div class="form">
+{% extends 'contest/auth_base.html' %}
+{% block content %}
 
     <ul class="tab-group">
         <li class="tab active"><a>Sign Up</a></li>
@@ -21,32 +13,32 @@
             <form action="{% url 'contest:signup' %}" method="post">
                 {% csrf_token %}
                 <div class="field-wrap">
-                    {{ form.username.label_tag }}
+                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
                     {{ form.username }}
                 </div>
 
                 <div class="field-wrap">
-                    {{ form.name.label_tag }}
+                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
                     {{ form.name }}
                 </div>
 
                 <div class="field-wrap">
-                    {{ form.email.label_tag }}
+                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                     {{ form.email }}
                 </div>
 
                 <div class="field-wrap">
-                    {{ form.college.label_tag }}
+                    <label for="{{ form.college.id_for_label }}">{{ form.college.label }}</label>
                     {{ form.college }}
                 </div>
 
                 <div class="field-wrap">
-                    {{ form.password1.label_tag }}
+                    <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
                     {{ form.password1 }}
                 </div>
 
                 <div class="field-wrap">
-                    {{ form.password2.label_tag }}
+                    <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
                     {{ form.password2 }}
                 </div>
 
@@ -61,9 +53,4 @@
 
     </div><!-- tab-content -->
 
-</div> <!-- /form -->
-<script src="{% static 'js/core/jquery.min.js' %}"></script>
-<script src="{% static 'f.js' %}"></script>
-
-</body>
-</html>
+{% endblock %}

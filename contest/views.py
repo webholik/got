@@ -6,7 +6,6 @@ from threading import Thread
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
@@ -196,16 +195,10 @@ def send_verification_email(receiver, url):
         logger.debug(e)
 
 
-# def api(request, id):
-#     if id:
-#         question = Question.objects.get(pk=id)
-#         data = {}
-#         data['text'] = question.text
-#         data['ans'] = question.correct_answer
-#         return HttpResponse(json.dumps(data))
-#     return HttpResponse('id not found')
-
-
 @verification_required
 def rules(request):
     return render(request, 'contest/rules.html')
+
+
+def reset_password(request):
+    return render(request, 'contest/reset_password.html')

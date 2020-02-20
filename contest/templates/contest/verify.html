@@ -1,19 +1,10 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Game Of Troves</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'b.css' %}">
-</head>
-<body>
-
-<div class="form">
-    <p style="text-align:center;color:#FFFFFF;font-weight:100;"> We've sent a verification email to {{ email }}. Please follow the link in the mail to verify your account.</p>
+{% extends 'contest/auth_base.html' %}
+{% block content %}
+    <p style="text-align:center;color:#FFFFFF;font-weight:100;"> We've sent a verification email to {{ email }}. Please
+        follow the link in the mail to verify your account.</p>
     <form method="POST">
         {% csrf_token %}
         <input type="hidden" name="resend_email" value="true">
         <input type="submit" class="button button-block" value="Resend Email">
     </form>
-</div>
-</body>
-</html>
+{% endblock %}

@@ -1,13 +1,5 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Game Of Troves</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'b.css' %}">
-</head>
-<body>
-
-<div class="form">
+{% extends 'contest/auth_base.html' %}
+{% block content %}
 
     <ul class="tab-group">
         <li class="tab"><a href="{% url 'contest:signup' %}">Sign Up</a></li>
@@ -22,24 +14,28 @@
                 {% csrf_token %}
 
                 <div class="field-wrap">
-                    <label>
-                        {{ form.username.label_tag }}<span class="req">*</span>
-                    </label>
+                    {% if not form.username.value %}
+                        <label for="{{ form.username.id_for_label }}">
+
+                            {{ form.username.label }}<span class="req">*</span>
+                        </label>
+                    {% endif %}
                     {{ form.username }}
                 </div>
 
                 <div class="field-wrap">
-                    <label>
-                        {{ form.password.label_tag }}<span class="req">*</span>
+                    <label for="{{ form.password.id_for_label }}">
+                        {{ form.password.label }}<span class="req">*</span>
                     </label>
                     {{ form.password }}
                 </div>
+                <p class="forgot"><a href="{% url 'contest:reset_password' %}">Forgot Password?</a></p>
                 {% if form.errors %}
                     {% for error in form.non_field_errors %}
-                    <p style="color:red"> {{error}} </p>
+                        <p style="color:white"> {{ error }} </p>
                     {% endfor %}
                 {% endif %}
-                <p class="forgot"><a href="#">Forgot Password?</a></p>
+
 
                 <input type="submit" value="Log In" class="button button-block">
 
@@ -49,10 +45,4 @@
         </div>
 
     </div><!-- tab-content -->
-
-</div> <!-- /form -->
-<script	src="{% static 'js/core/jquery.min.js' %}"></script>
-<script src="{% static 'f.js' %}"></script>
-
-</body>
-</html>
+{% endblock %}
