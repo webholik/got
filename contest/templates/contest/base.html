@@ -112,6 +112,11 @@
 
 
 </div> -->
+        {% if unread_messages %}
+            {% for message in unread_messages %}
+                <p> {{ message.text }} </p>
+            {% endfor %}
+        {% endif %}
         {% block content %} {% endblock %}
 
         <footer class="footer footer-black  footer-white ">
