@@ -12,35 +12,43 @@
 
             <form action="{% url 'contest:signup' %}" method="post">
                 {% csrf_token %}
-                <div class="field-wrap">
-                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
-                    {{ form.username }}
-                </div>
-
-                <div class="field-wrap">
-                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-                    {{ form.name }}
-                </div>
-
-                <div class="field-wrap">
-                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                    {{ form.email }}
-                </div>
-
-                <div class="field-wrap">
-                    <label for="{{ form.college.id_for_label }}">{{ form.college.label }}</label>
-                    {{ form.college }}
-                </div>
-
-                <div class="field-wrap">
-                    <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
-                    {{ form.password1 }}
-                </div>
-
-                <div class="field-wrap">
-                    <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
-                    {{ form.password2 }}
-                </div>
+                {% for field in form %}
+                    <div class="field-wrap">
+{#                        {% if not field.value %}#}
+{#                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>#}
+{#                        {% endif %}#}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+                {#                <div class="field-wrap">#}
+                {#                    <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>#}
+                {#                    {{ form.username }}#}
+                {#                </div>#}
+                {##}
+                {#                <div class="field-wrap">#}
+                {#                    <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>#}
+                {#                    {{ form.name }}#}
+                {#                </div>#}
+                {##}
+                {#                <div class="field-wrap">#}
+                {#                    <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>#}
+                {#                    {{ form.email }}#}
+                {#                </div>#}
+                {##}
+                {#                <div class="field-wrap">#}
+                {#                    <label for="{{ form.college.id_for_label }}">{{ form.college.label }}</label>#}
+                {#                    {{ form.college }}#}
+                {#                </div>#}
+                {##}
+                {#                <div class="field-wrap">#}
+                {#                    <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>#}
+                {#                    {{ form.password1 }}#}
+                {#                </div>#}
+                {##}
+                {#                <div class="field-wrap">#}
+                {#                    <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>#}
+                {#                    {{ form.password2 }}#}
+                {#                </div>#}
 
                 <input type="submit" class="button button-block" value="Sign Up">
 

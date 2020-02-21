@@ -14,19 +14,19 @@
                 {% csrf_token %}
 
                 <div class="field-wrap">
-                    {% if not form.username.value %}
-                        <label for="{{ form.username.id_for_label }}">
-
-                            {{ form.username.label }}<span class="req">*</span>
-                        </label>
-                    {% endif %}
+{#                    {% if not form.username.value %}#}
+{#                        <label for="{{ form.username.id_for_label }}">#}
+{##}
+{#                            {{ form.username.label }}<span class="req">*</span>#}
+{#                        </label>#}
+{#                    {% endif %}#}
                     {{ form.username }}
                 </div>
 
                 <div class="field-wrap">
-                    <label for="{{ form.password.id_for_label }}">
-                        {{ form.password.label }}<span class="req">*</span>
-                    </label>
+{#                    <label for="{{ form.password.id_for_label }}">#}
+{#                        {{ form.password.label }}<span class="req">*</span>#}
+{#                    </label>#}
                     {{ form.password }}
                 </div>
                 <p class="forgot"><a href="{% url 'contest:reset_password' %}">Forgot Password?</a></p>

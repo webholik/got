@@ -11,18 +11,24 @@ class NewUserForm(forms.ModelForm):
     password1 = forms.CharField(
         label='Password',
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Password'})
     )
 
     password2 = forms.CharField(
         label='Confirm Password',
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Confirm Password'})
     )
 
     class Meta:
         model = Contestant
         fields = ['username', 'name', 'email', 'college']
+        widgets = {
+            'username': forms.TextInput(attrs={'placeholder': 'Username'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Name'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Email'}),
+            'college': forms.TextInput(attrs={'placeholder': 'College'}),
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
@@ -51,12 +57,12 @@ class AnswerForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(
         label='Username',
-        widget=forms.TextInput(attrs={'autofocus': True, 'autocapitalize': 'none', 'autocomplete': 'username'})
+        widget=forms.TextInput(attrs={'autofocus': True, 'autocapitalize': 'none', 'autocomplete': 'username', 'placeholder': 'Username'})
     )
 
     password = forms.CharField(
         label='Password',
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Password'}),
         strip=False
     )
 
