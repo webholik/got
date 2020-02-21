@@ -4,12 +4,18 @@ from datetime import timedelta
 from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
 
 class Contest(models.Model):
     start_time = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.pk and self.objects.exists():
+            raise ValidationError("There can only be one contest")
+        return super().save(*args, **kwargs)
 
 
 class Question(models.Model):
@@ -20,7 +26,6 @@ class Question(models.Model):
     answer_description = models.TextField(blank=True)
     # release_date = models.DateTimeField()
     points = models.IntegerField()
-
 
     def __str__(self):
         return f"Question {self.number}"
