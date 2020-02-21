@@ -13,7 +13,7 @@ from django.shortcuts import render, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
-from .decorators import verification_required
+from .utils import verification_required
 from .forms import NewUserForm, AnswerForm, LoginForm
 from .models import Question, Answer, Contestant, ActivationModel, Contest
 

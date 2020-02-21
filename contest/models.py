@@ -97,6 +97,9 @@ class Contestant(AbstractBaseUser):
         minutes, seconds = divmod(rest, 60)
         return f'{hours}:{minutes}:{seconds}'
 
+    def unread_messages(self):
+        return self.message_set.filter(seen=False)
+
     def get_full_name(self):
         return self.name
 
@@ -159,3 +162,9 @@ class ActivationModel(AbstractHashModel):
 
 class PasswordResetModel(AbstractHashModel):
     pass
+
+
+class Message(models.Model):
+    text = models.TextField()
+    seen = models.BooleanField(default=False)
+    contestant = models.ForeignKey(to=Contestant, on_delete=models.CASCADE)

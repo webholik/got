@@ -10,3 +10,14 @@ def verification_required(function):
     else:
         pass
     return actual_decorator
+
+
+def process_messages(request):
+    """Add unread messages to Template contexts"""
+    ret = {}
+    if request.user.is_authenticated:
+        messages = request.user.unread_messages()
+        if messages:
+            ret['unread_messages'] = messages
+
+    return ret
