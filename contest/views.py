@@ -160,7 +160,6 @@ def verify_view(request):
                 contestant.save()
                 return HttpResponseRedirect(reverse('contest:question'))
 
-    logout(request)
     return render(request, 'contest/verify.html', {'email': request.user.email})
 
 
