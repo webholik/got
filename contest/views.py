@@ -193,14 +193,16 @@ def password_reset_util(user):
     hashcode = model.hash
     url = 'http://' + settings.ALLOWED_HOSTS[0] + '/reset/?h=' + hashcode
     header = "Reset Password"
-    message = "We have received a request to reset your password on Neodrishti Game of Troves\n\n"\
-              + "If the request was made by you then please follow the link below to reset your password. Otherwise simply ignore this email.\n\n"\
+    message = "We have received a request to reset your password on Neodrishti Game of Troves\n\n" \
+              + "If the request was made by you then please follow the link below to reset your password." \
+              + "Otherwise simply ignore this email.\n\n" \
               + url
     html_message = f'''
                     <html>
                         <body>
                             We have received a request to reset your password on Neodrishti Game of Troves <br><br>
-                            If the request was made by you then please follow the link below to reset your password. Otherwise simply ignore this email. <br><br> {url}
+                            If the request was made by you then please follow the link below to reset your password. 
+                            Otherwise simply ignore this email. <br><br> {url} 
                         </body>
                     </html>
                 '''
@@ -273,4 +275,3 @@ def reset(request):
                 return HttpResponseRedirect(reverse('contest:login'))
 
     return render(request, 'contest/reset.html', {'error': True})
-

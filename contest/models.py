@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.core.mail import send_mail
+from .utils import send_mail
 
 logger = logging.getLogger('got')
 
@@ -128,11 +128,9 @@ class Contestant(AbstractBaseUser):
         try:
             send_mail(
                 header,
-                message,
-                settings.CONTEST_SENDER_EMAIL,
                 self.email,
-                fail_silently=False,
-                html_message=html_message,
+                message,
+                html_message,
             )
         except SMTPException as e:
             logger.exception(e)

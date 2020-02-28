@@ -21,13 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'o1#mu&+cswebfeqs8t=ylj6glx+rbo%7r39aw-2b$ox29dxxgz'
 
-# Email credential for sending mail
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'bloodybaffoon@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -149,4 +142,6 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 # AUTH_USER_MODEL='contest.User'
 
-CONTEST_SENDER_EMAIL = "ankit@neodrishti.com"
+CONTEST_SENDER_EMAIL = "nd.ojass@nitjsr.ac.in"
+INJECTION_API_KEY = os.environ.get('INJECTION_API_KEY')
+SERVER_ID = os.environ.get('SERVER_ID')
