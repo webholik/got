@@ -1,0 +1,21 @@
+{% extends 'contest/auth_base.html' %}
+{% block content %}
+    <div class="tab-content">
+        <h1>Reset your password</h1>
+        {% if not error %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="field-wrap">
+                    {{ form.password1 }}
+                </div>
+                <div class="field-wrap">
+                    {{ form.password2 }}
+                </div>
+
+                <input type="submit" value="Reset" class="button">
+            </form>
+        {% else %}
+            <p> Invalid request</p>
+        {% endif %}
+    </div>
+{% endblock %}

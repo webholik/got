@@ -5,7 +5,6 @@ from threading import Thread
 
 from django.conf import settings
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
@@ -13,9 +12,9 @@ from django.shortcuts import render, reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
+from .forms import NewUserForm, AnswerForm, LoginForm, PasswordResetForm
+from .models import Question, Answer, Contestant, ActivationModel, Contest, PasswordResetModel
 from .utils import verification_required
-from .forms import NewUserForm, AnswerForm, LoginForm
-from .models import Question, Answer, Contestant, ActivationModel, Contest
 
 logger = logging.getLogger('got')
 
@@ -111,7 +110,7 @@ def signup(request):
             contestant.save()
             login(request, contestant)
             act = ActivationModel.objects.create(contestant=contestant)
-            activation_util(request)
+            activation_util(contestant)
             return HttpResponseRedirect(reverse('contest:verify'))
         else:
             return render(request, 'contest/signup.html', {'form': form})
@@ -140,16 +139,18 @@ def logoutview(request):
     return HttpResponseRedirect(reverse('contest:index'))
 
 
-@login_required
-@require_http_methods(['GET', 'POST'])
 def verify_view(request):
     if request.user.is_active:
         return HttpResponseRedirect(reverse('contest:question'))
 
     if request.method == 'POST':
         resend = request.POST.get('resend_email')
-        if resend:
-            activation_util(request)
+        username = request.session.get('user')
+        user = Contestant.objects.get(pk=username)
+        if user and resend:
+            activation_util(user)
+        else:
+            return HttpResponseRedirect(reverse('contest:login'))
     else:
         hashcode = request.GET.get('h')
         if hashcode:
@@ -160,15 +161,51 @@ def verify_view(request):
                 contestant.save()
                 return HttpResponseRedirect(reverse('contest:question'))
 
-    return render(request, 'contest/verify.html', {'email': request.user.email})
+    if request.user.is_authenticated:
+        user = request.user
+        logout(request)
+        request.session['user'] = user.username
+        return render(request, 'contest/verify.html', {'email': user.email})
+    else:
+        return HttpResponseRedirect(reverse('contest:login'))
 
 
-def activation_util(request):
-    contestant = request.user
-    email = contestant.email
-    hashcode = ActivationModel.objects.get(contestant=contestant).hash
+def activation_util(user):
+    hashcode = ActivationModel.objects.get(contestant=user).hash
     url = settings.ALLOWED_HOSTS[0] + '/verify/?h=' + hashcode
-    t = Thread(target=partial(send_verification_email, receiver=email, url=url))
+    header = "Verify account"
+    message = "Thank you for signing up for NeoDrishti Game of Troves.\n\n" + "Please follow the link below to verify your account.\n\n" + url
+    html_message = f'''
+                <html>
+                    <body>
+                        Thank you for signing up for NeoDrishti Game of Troves. <br><br>
+                        Please follow the link below to verify your account. <br><br> {url}
+                    </body>
+                </html>
+            '''
+
+    t = Thread(target=partial(user.send_email, header=header, message=message, html_message=html_message))
+    t.start()
+
+
+def password_reset_util(user):
+    model = PasswordResetModel.objects.create(contestant=user)
+    hashcode = model.hash
+    url = 'http://' + settings.ALLOWED_HOSTS[0] + '/reset/?h=' + hashcode
+    header = "Reset Password"
+    message = "We have received a request to reset your password on Neodrishti Game of Troves\n\n"\
+              + "If the request was made by you then please follow the link below to reset your password. Otherwise simply ignore this email.\n\n"\
+              + url
+    html_message = f'''
+                    <html>
+                        <body>
+                            We have received a request to reset your password on Neodrishti Game of Troves <br><br>
+                            If the request was made by you then please follow the link below to reset your password. Otherwise simply ignore this email. <br><br> {url}
+                        </body>
+                    </html>
+                '''
+
+    t = Thread(target=partial(user.send_email, header=header, message=message, html_message=html_message))
     t.start()
 
 
@@ -201,4 +238,39 @@ def rules(request):
 
 
 def reset_password(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('contest:question'))
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = Contestant.objects.filter(email=email)
+        if user:
+            password_reset_util(user[0])
+            return render(request, 'contest/reset_password.html', {'sent': True})
+        else:
+            return render(request, 'contest/reset_password.html', {'error': True})
+
     return render(request, 'contest/reset_password.html')
+
+
+def reset(request):
+    if request.method == 'GET':
+        hashcode = request.GET.get('h')
+        model = PasswordResetModel.objects.filter(hash=hashcode)
+        if model:
+            user = model[0].contestant
+            model[0].delete()
+            request.session['user'] = user.username
+            return render(request, 'contest/reset.html', {'form': PasswordResetForm})
+    elif request.method == 'POST':
+        username = request.session.get('user')
+        user = Contestant.objects.filter(pk=username)
+        if user:
+            form = PasswordResetForm(request.POST)
+            if form.is_valid():
+                user[0].set_password(form.cleaned_data['password1'])
+                user[0].save()
+                return HttpResponseRedirect(reverse('contest:login'))
+
+    return render(request, 'contest/reset.html', {'error': True})
+

@@ -1,5 +1,7 @@
 import random
 from datetime import timedelta
+import logging
+from smtplib import SMTPException
 
 from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.contrib.auth.models import User
@@ -7,6 +9,10 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
+from django.core.mail import send_mail
+
+logger = logging.getLogger('got')
 
 
 class Contest(models.Model):
@@ -117,6 +123,19 @@ class Contestant(AbstractBaseUser):
     def has_module_perms(self, app_label):
         print(f'has_module_perms called {app_label}')
         return self.is_staff
+
+    def send_email(self, header, message, html_message=None):
+        try:
+            send_mail(
+                header,
+                message,
+                settings.CONTEST_SENDER_EMAIL,
+                self.email,
+                fail_silently=False,
+                html_message=html_message,
+            )
+        except SMTPException as e:
+            logger.exception(e)
 
 
 class Answer(models.Model):

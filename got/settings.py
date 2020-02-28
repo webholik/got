@@ -148,3 +148,5 @@ STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 # AUTH_USER_MODEL='contest.User'
+
+CONTEST_SENDER_EMAIL = "ankit@neodrishti.com"

@@ -13,6 +13,7 @@ urlpatterns = [
     path('verify/', views.verify_view, name='verify'),
     # path('resend_email/', views.resend_email, name='resend_email'),
     path('rules/', views.rules, name='rules'),
-    path('reset_password/', views.reset_password, name='reset_password')
+    path('reset_password/', views.reset_password, name='reset_password'),
+    path('reset/', views.reset, name='reset'),
     # path('api/<int:id>', views.api, name='api'),
 ]

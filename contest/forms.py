@@ -48,6 +48,33 @@ class NewUserForm(forms.ModelForm):
         return user
 
 
+class PasswordResetForm(forms.Form):
+    error_messages = {
+        'password_mismatch': 'The two password fields did not match.'
+    }
+    password1 = forms.CharField(
+        label='Password',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'New Password'})
+    )
+
+    password2 = forms.CharField(
+        label='Confirm Password',
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Confirm Password'})
+    )
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError(
+                self.error_messages['password_mismatch'],
+                code='password_mismatch',
+            )
+        return password2
+
+
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
