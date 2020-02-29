@@ -1,7 +1,9 @@
+import datetime
 import logging
 from functools import partial
 from smtplib import SMTPException
 from threading import Thread
+import math
 
 from django.conf import settings
 from django.contrib.auth import login, logout
@@ -13,7 +15,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from .forms import NewUserForm, AnswerForm, LoginForm, PasswordResetForm
-from .models import Question, Answer, Contestant, ActivationModel, Contest, PasswordResetModel
+from .models import Question, Answer, Contestant, ActivationModel, Contest, PasswordResetModel, Message
 from .utils import verification_required
 
 logger = logging.getLogger('got')
@@ -51,10 +53,30 @@ def handle_answer(request):
         contestant.points += question.points
         contest = Contest.objects.get(pk=1)
         contestant.extra_time += answer.time - contest.start_time
+        contestant.last_answered = timezone.now()
         contestant.save()
         return
     else:
         return True
+
+
+def ques_util(request, context):
+    diff = timezone.now() - request.user.last_answered
+    hints = context['question'].hint_set.all()
+    context['hints'] = []
+    if diff > datetime.timedelta(hours=3):
+        context['hints'] = hints
+        context['time_left'] = -1;
+    elif diff > datetime.timedelta(hours=2):
+        context['hints'].extend([hints[0], hints[1]])
+        context['time_left'] = math.ceil((datetime.timedelta(hours=3) - diff).seconds / 60)
+    elif diff > datetime.timedelta(hours=1):
+        context['hints'].append(hints[0])
+        context['time_left'] = math.ceil((datetime.timedelta(hours=2) - diff).seconds / 60)
+    else:
+        context['time_left'] = math.ceil((datetime.timedelta(hours=1) - diff).seconds / 60)
+
+    return render(request, 'contest/questions.html', context)
 
 
 @verification_required
@@ -63,6 +85,15 @@ def ques(request):
     if request.method == 'POST':
         if handle_answer(request):
             context['error'] = True
+        else:
+            q_num = request.POST.get('question_id')
+            question = Question.objects.get(pk=q_num)
+            if question:
+                context['question'] = question
+                context['answer_form'] = AnswerForm()
+                context['solved'] = True
+                # return render(request, 'contest/questions.html', context)
+                return ques_util(request, context)
 
     questions = Question.objects.all().order_by('number')
     contestant = request.user
@@ -70,8 +101,8 @@ def ques(request):
         if q not in contestant.answered_questions.all():
             context['question'] = q
             context['answer_form'] = AnswerForm()
-            return render(request, 'contest/questions.html', context)
-
+            # return render(request, 'contest/questions.html', context)
+            return ques_util(request, context)
     return render(request, 'contest/questions.html')
 
 
@@ -234,9 +265,9 @@ def send_verification_email(receiver, url):
         logger.debug(e)
 
 
-@verification_required
-def rules(request):
-    return render(request, 'contest/rules.html')
+# @verification_required
+# def rules(request):
+#     pass
 
 
 def reset_password(request):
@@ -275,3 +306,12 @@ def reset(request):
                 return HttpResponseRedirect(reverse('contest:login'))
 
     return render(request, 'contest/reset.html', {'error': True})
+
+
+def read_message(request):
+    id = request.POST.get('id')
+    message = Message.objects.filter(id=id)
+    if message and not message[0].seen:
+        message[0].seen = True
+        message[0].save()
+

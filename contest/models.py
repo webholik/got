@@ -18,10 +18,10 @@ logger = logging.getLogger('got')
 class Contest(models.Model):
     start_time = models.DateTimeField()
 
-    def save(self, *args, **kwargs):
-        if not self.pk and self.objects.exists():
-            raise ValidationError("There can only be one contest")
-        return super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk and self.objects.exists():
+    #         raise ValidationError("There can only be one contest")
+    #     return super().save(*args, **kwargs)
 
 
 class Question(models.Model):
@@ -90,6 +90,7 @@ class Contestant(AbstractBaseUser):
     points = models.IntegerField(default=0)
     extra_time = models.DurationField(default=timedelta(0))
     answered_questions = models.ManyToManyField(Question, blank=True)
+    last_answered = models.DateTimeField(default=timezone.now)
 
     objects = CustomManager()
 
@@ -148,9 +149,8 @@ class Answer(models.Model):
 
 class Hint(models.Model):
     text = models.CharField(max_length=500, blank=True)
-    image = models.ImageField(blank=True)
+    image = models.ImageField(blank=True, upload_to='hints')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    release_date = models.DateTimeField()
 
 
 def generate_random_string():

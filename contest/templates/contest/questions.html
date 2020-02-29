@@ -2,51 +2,107 @@
 
 {% load static %}
 {% block title %}
-Questions
+    Questions
 {% endblock %}
 {% block active_question %}
-active
+    active
 {% endblock %}
-      <!-- End Navbar -->
-      <!-- <div class="panel-header panel-header-lg">
+{% block navlink %}
+    <li class="nav-item">
+        <a href="{% url 'contest:leaderboard' %}" class="nav-link ">
+            <i class="nc-icon nc-tile-56"></i>
+            <p>Leaderboard</p>
+        </a>
+    </li>{% endblock %}
 
-  <canvas id="bigDashboardChart"></canvas>
+<!-- End Navbar -->
+<!-- <div class="panel-header panel-header-lg">
+
+<canvas id="bigDashboardChart"></canvas>
 
 
 </div> -->
 {% block content %}
-        <div class="content">
-                <div class="row">
-                    <div class="col-md-12">
-                    {% if question %}
-                        <div class="card ">
-                            <div class="card-header ">
-{#                                <h5 class="card-title">Questions</h5>#}
-                                <p class="card-category">Q.{{ question.number }}</p>
-                            </div>
-                            <div class="card-body ">
-                                <h1>{{ question.text }}</h1>
-                                {% if question in contestant.answered_questions.all %}
-                                    <p> <span style="color:green">✔ </span>Answered</p>
-                                {% else %}
+{#    <div class="content">#}
+        <div class="row">
+            <div class="col-md-8">
+                {% if question %}
+                    <div class="card ">
+                        <div class="card-header ">
+                            {#                                <h5 class="card-title">Questions</h5>#}
+                            <p class="card-category">Q.{{ question.number }}</p>
+                        </div>
+                        <div class="card-body ">
+                            <h1>{{ question.text }}</h1>
+                            {% if solved %}
+                                <p><span style="color:green">✔ </span>Answered</p>
+                            {% else %}
                                 <form method="post">
                                     {% csrf_token %}
-                                    <input type="hidden" name="question_id" value="{{ question.id }}" class="form-control border-input">
+                                    <input type="hidden" name="question_id" value="{{ question.id }}"
+                                           class="form-control border-input">
                                     {{ answer_form.text }}
                                     <input type="submit" value="submit" class="btn btn-info btn-fill btn-wd">
                                 </form>
-                                    {% if error %}
-                                        <p style="color:red"> Wrong Answer!</p>
-                                    {% endif %}
+                                {% if error %}
+                                    <p style="color:red"> Wrong Answer!</p>
                                 {% endif %}
+                            {% endif %}
 
+                        </div>
+                    </div>
+                    {% if solved %}
+                        <div class="card alert alert-success">
+                            <div class="card-header">
+                                Solution
+                            </div>
+                            <div class="card-body">
+                                <p>{{ question.answer_description }}</p>
                             </div>
                         </div>
-                        {% else %}
-                        <p> No more questions. </p>
+                        <a href="{% url 'contest:question' %}">
+                            <button class="btn btn-info btn-fill btn-wd">Next Question</button>
+                        </a>
                     {% endif %}
+                {% else %}
+                    <p> Congrats! No more questions. </p>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                {% if time_left and time_left != -1 %}
+                    <div class="card">
+                        <div class="card-body">
+                            <p style="text-align:center;">Next hint in <span id="time_left"></span></p>
+                        </div>
                     </div>
-                </div>
-      </div>
+                {% endif %}
+                {% for hint in hints %}
+                    <div class="card">
+                        <div class="card-header"><h5 class="card-title">Hint {{ forloop.counter }}</h5></div>
+                        <div class="card-body"><img src="{{ hint.image.url }}"></img></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+{#    </div>#}
+{% endblock %}
+{% block custom_script %}
+    <script type="text/javascript">
+    let time_left = {{ time_left }};
+    let elem = document.getElementById('time_left');
+    elem.innerHTML = time_left + (time_left === 1 ? ' minute' : ' minutes');
+    if (time_left !== -1) {
+        setInterval(() => {
+            time_left--;
+            if (time_left > 0) {
+                let word = time_left === 1 ? ' minute' : ' minutes';
+                elem.innerHTML = time_left + word;
+            } else {
+                location.reload();
+            }
+        }, 60000);
+    }
+
+    </script>
 {% endblock %}
 

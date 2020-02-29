@@ -2,7 +2,7 @@
 
 @font-face{
 	font-family:'t';
-	src:url('/static/throne-of-egypt.regular.ttf');
+	src:url('/throne-of-egypt.regular.ttf');
 }
 
 /*@font-face{
@@ -13,7 +13,7 @@ body{
 	margin:0px;
 	padding:0px;
 	width:100%;
-	
+
 }
 
 .gr{
@@ -24,7 +24,7 @@ body{
 
 }
 
-header
+/*header
 {
 
 
@@ -32,53 +32,79 @@ header
 main{
 
 	}
+*/
+/*.btn-block{
 
-footer{
-	background-image:url(/static/assets/img/b3.jpg);
-	background-color:blue;
+	border-radius:30px !important;
+	border-style: none;
+	background-image: url(/assets/img/b3.jpg) !important;
+	margin-top:5%;
+	margin-bottom:20%;
+	}*/
+
+/*footer{
+	background-image:url(/assets/img/b3.jpg);
+
 	margin-top:auto;
-}
+	color:#A86700;
 
+}
+*/
 /*navbar*/
 
-.reg{
+/*.reg{
 	margin-right: 2%;
-}
+}*/
 
-.navbar-light{
+/*.navbar-light{
 	height: 1fr;
 	color:#806A41;
-	background-image:url(/static/assets/img/b2.jpg);
+	background-image:url(/assets/img/b2.jpg);
 	background-repeat: no-repeat;
-	
-	
+	border-bottom-left-radius:500px;
+	border-bottom-right-radius:500px;
+
 	-webkit-box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.65);
 -moz-box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.65);
 box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.65);
-}
+}*/
 
 .section1{
 	display: flex;
 	flex-direction:column;
 	justify-content:center;
 	align-items: center;
-	background-image:url(/static/assets/img/bg2.jpg);
+	background-image:url(/static/assets/img/comp4.jpg);
+	background-size:cover;
 	min-height:100vh;
 
 
 }
 
 .innerhead{
-	
-	color:#A86700;
-	max-width:95%;
+
+	color:#F5E67F;
+	min-width:100%;
 	text-align: center;
 }
 
 .innerhead >h1{
 	font-family:t;
-	
+
 	font-size: 110px;
 }
 
+.innerhead >img{
+	max-width:100%;height:90%;
+}
 
+
+
+@media only screen and (max-width:900px) {
+
+	.innerhead{
+		min-width:174%;
+	}
+
+
+}

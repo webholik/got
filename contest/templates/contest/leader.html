@@ -1,18 +1,26 @@
 {% extends 'contest/base.html' %}
 {% block title %}
-Leaderboard
+    Leaderboard
 {% endblock %}
 {% block active_leaderboard %}
-active
+    active
+{% endblock %}
+{% block navlink %}
+    <li class="nav-item">
+        <a href="{% url 'contest:question' %}" class="nav-link ">
+            <i class="nc-icon nc-bank"></i>
+            <p>Questions</p>
+        </a>
+    </li>
 {% endblock %}
 {% block content %}
     <div class="content">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-{#                    <div class="card-header">#}
-{#                        <h4 class="card-title " style="text-align: center;"> LeaderBoard</h4>#}
-{#                    </div>#}
+                    {#                    <div class="card-header">#}
+                    {#                        <h4 class="card-title " style="text-align: center;"> LeaderBoard</h4>#}
+                    {#                    </div>#}
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table">
@@ -33,20 +41,20 @@ active
                                 <tbody>
                                 {% for user in page_obj %}
                                     {% if user.username != 'admin' %}
-                                    <tr>
-                                        <td>
-                                            {{ forloop.counter|add:start_num }}
-                                        </td>
-                                        <td>
-                                            {{ user.username }}
-                                        </td>
-                                        <td>
-                                            {{ user.points }}
-                                        </td>
-                                        <td class="text-right">
-                                            {{ user.get_extra_time }}
-                                        </td>
-                                    </tr>
+                                        <tr>
+                                            <td>
+                                                {{ forloop.counter|add:start_num }}
+                                            </td>
+                                            <td>
+                                                {{ user.username }}
+                                            </td>
+                                            <td>
+                                                {{ user.points }}
+                                            </td>
+                                            <td class="text-right">
+                                                {{ user.get_extra_time }}
+                                            </td>
+                                        </tr>
                                     {% endif %}
                                 {% endfor %}
                                 </tbody>
@@ -57,12 +65,16 @@ active
             </div>
 
         </div>
-    {% if page_obj.has_previous %}
-    <a href="{% url 'contest:leaderboard' %}?page={{ page_obj.previous_page_number }}"><button class="btn">Previous</button></a>
-    {% endif %}
-    {% if page_obj.has_next %}
-        <a href="{% url 'contest:leaderboard' %}?page={{ page_obj.next_page_number }}"><button class="btn">Next</button></a>
-    {% endif %}
+        {% if page_obj.has_previous %}
+            <a href="{% url 'contest:leaderboard' %}?page={{ page_obj.previous_page_number }}">
+                <button class="btn">Previous</button>
+            </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a href="{% url 'contest:leaderboard' %}?page={{ page_obj.next_page_number }}">
+                <button class="btn">Next</button>
+            </a>
+        {% endif %}
     </div>
 {% endblock %}
 

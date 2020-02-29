@@ -24,7 +24,10 @@ def process_messages(request):
     if request.user.is_authenticated:
         messages = request.user.unread_messages()
         if messages:
-            ret['unread_messages'] = messages
+            ret['unread_message'] = messages[0]
+            # for m in messages:
+            #     m.seen = True;
+            #     m.save()
 
     return ret
 
