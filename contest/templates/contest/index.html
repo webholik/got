@@ -4,44 +4,28 @@
 <head>
     <title>Game Of Troves</title>
     <link rel="stylesheet" type="text/css" href="{% static 'a.css' %}">
-    <link href="{% static  'css/bootstrap.min.css'%}" rel="stylesheet" />
+    <link href="{% static  'css/bootstrap.min.css' %}" rel="stylesheet"/>
 </head>
 <body>
 
 <div class="gr">
-	<!-- <header>
-	<nav class="navbar navbar-expand-lg navbar-light fixed-top">
-	<div class="container-fluid">
-
-	<a href="index.html" class="navbar-brand ml-3" style="color:#A86700; font-family:t; font-weight: bolder; font-size:120%;">
-		<span><img src="/assets/img/5.png" style="width:25px;"></span>Game Of Troves</a>
-
-	<div class="collapse navbar-collapse"></div>
-
-</div>
-</nav>
-	</nav>
-</header>
- -->
-		
-	
     <main>
         <div class="section1">
-			
+
             <div class="innerhead">
-                <img src="{% static  'Background.png'%}" >
-{#                <h1>Game of Troves</h1>#}
-{#                <a href="{% url 'contest:login' %}">#}
+                <img src="{% static  'Background.png' %}">
+                {#                <h1>Game of Troves</h1>#}
+                <a href="{% url 'contest:login' %}">
                     <button type="button" class="btn btn-outline-warning btn-lg">Log In/Sign Up</button>
-{#                </a>#}
-				
+                </a>
+
             </div>
 
         </div>
 
     </main>
 </div>
-	
+
 <script src="{% static 'js/core/jquery.min.js' %}"></script>
 <script src="{% static 'js/core/popper.min.js' %}"></script>
 <script src="{% static 'js/core/bootstrap.min.js' %}"></script>

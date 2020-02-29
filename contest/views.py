@@ -203,7 +203,7 @@ def verify_view(request):
 
 def activation_util(user):
     hashcode = ActivationModel.objects.get(contestant=user).hash
-    url = settings.ALLOWED_HOSTS[0] + '/verify/?h=' + hashcode
+    url = 'http://' + settings.ALLOWED_HOSTS[0] + '/verify/?h=' + hashcode
     header = "Verify account"
     message = "Thank you for signing up for NeoDrishti Game of Troves.\n\n" + "Please follow the link below to verify your account.\n\n" + url
     html_message = f'''
@@ -240,29 +240,6 @@ def password_reset_util(user):
 
     t = Thread(target=partial(user.send_email, header=header, message=message, html_message=html_message))
     t.start()
-
-
-def send_verification_email(receiver, url):
-    try:
-        send_mail(
-            "Verify account",
-            "Thank you for signing up for NeoDrishti Game of Troves.\n\n"
-            "Please follow the link below to verify your account.\n\n" + url,
-            "ankit@neodrishti.com",
-            [receiver],
-            fail_silently=False,
-            html_message=f'''
-                <html>
-                    <body>
-                        Thank you for signing up for NeoDrishti Game of Troves. <br><br>
-                        Please follow the link below to verify your account. <br><br> {url}
-                    </body>
-                </html>
-            '''
-        )
-    except SMTPException as e:
-        logger.exception(e)
-        logger.debug(e)
 
 
 # @verification_required
