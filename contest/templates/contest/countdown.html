@@ -1,0 +1,49 @@
+{% extends 'contest/auth_base.html' %}
+{% block content %}
+    <p style="text-align:center;color:#FFFFFF;font-weight:200;"> The contest starts in <span
+            id="time"></span></p>
+
+    <script type="text/javascript">
+        var days = {{ start_time.days }};
+        var seconds = {{ start_time.seconds }};
+        var hours = Math.floor(seconds / 3600);
+        seconds = seconds % 3600;
+        var minutes = Math.floor(seconds / 60);
+        seconds = minutes % 60;
+
+        function setTime() {
+            seconds--;
+            if (seconds < 0) {
+                minutes--;
+                if (minutes < 0) {
+                    hours--;
+                    if (hours < 0) {
+                        days--;
+                        if (days < 0) {
+                            location.reload();
+                        }
+                        hours = 23;
+                    }
+                    minutes = 59;
+                }
+                seconds = 59;
+            }
+            var word;
+            if (days !== 0) {
+                word = days === 1 ? '1 day, ' : days + ' days, ';
+            }
+            if (days !== 0 || hours !== 0) {
+                word += hours === 1 ? '1 hour, ' : hours + ' hours, ';
+            }
+            if (days !== 0 || hours !== 0 || minutes !== 0) {
+                word += minutes === 1 ? '1 minute, ' : minutes + ' minutes, ';
+            }
+
+            word += seconds === 1 ? '1 second.' : seconds + ' seconds.';
+            document.querySelector('#time').innerHTML = word;
+        }
+        setTime()
+        setInterval(setTime, 1000);
+
+    </script>
+{% endblock %}
