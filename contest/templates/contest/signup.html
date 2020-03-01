@@ -14,10 +14,13 @@
                 {% csrf_token %}
                 {% for field in form %}
                     <div class="field-wrap">
-{#                        {% if not field.value %}#}
-{#                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>#}
-{#                        {% endif %}#}
+                        {#                        {% if not field.value %}#}
+                        {#                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>#}
+                        {#                        {% endif %}#}
                         {{ field }}
+                        {% for error in field.errors %}
+                            <span style="color:red;">{{ error }}</span>
+                        {% endfor %}
                     </div>
                 {% endfor %}
                 {#                <div class="field-wrap">#}
