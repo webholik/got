@@ -22,7 +22,8 @@ logger = logging.getLogger('got')
 def index(request):
     if request.user.is_active:
         return HttpResponseRedirect(reverse('contest:question'))
-    return render(request, "contest/index.html")
+    return HttpResponseRedirect(reverse('contest:login'))
+    # return render(request, "contest/index.html")
 
 
 def handle_answer(request):
