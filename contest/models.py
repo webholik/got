@@ -1,15 +1,16 @@
-import random
-from datetime import timedelta
 import logging
+import os
+import random
+import uuid
+from datetime import timedelta
 from smtplib import SMTPException
 
 from django.contrib.auth.models import AbstractBaseUser, UserManager
 from django.contrib.auth.models import User
 from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
+
 from .utils import send_mail
 
 logger = logging.getLogger('got')
@@ -147,9 +148,15 @@ class Answer(models.Model):
         return 'Answer'
 
 
+def get_unique_name(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    return os.path.join('hints', filename)
+
+
 class Hint(models.Model):
     text = models.CharField(max_length=500, blank=True)
-    image = models.ImageField(blank=True, upload_to='hints')
+    image = models.ImageField(blank=True, upload_to=get_unique_name)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
 
