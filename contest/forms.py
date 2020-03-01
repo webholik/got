@@ -8,6 +8,8 @@ class NewUserForm(forms.ModelForm):
     error_messages = {
         'password_mismatch': 'The two password fields did not match.'
     }
+
+    phone = forms.RegexField(regex=r'^\d{10}$', widget=forms.TextInput(attrs={'placeholder': 'Phone number'}))
     password1 = forms.CharField(
         label='Password',
         strip=False,
@@ -84,7 +86,8 @@ class AnswerForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(
         label='Username',
-        widget=forms.TextInput(attrs={'autofocus': True, 'autocapitalize': 'none', 'autocomplete': 'username', 'placeholder': 'Username'})
+        widget=forms.TextInput(
+            attrs={'autofocus': True, 'autocapitalize': 'none', 'autocomplete': 'username', 'placeholder': 'Username'})
     )
 
     password = forms.CharField(
