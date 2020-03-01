@@ -1,13 +1,11 @@
 import datetime
 import logging
-from functools import partial
-from smtplib import SMTPException
-from threading import Thread
 import math
+from functools import partial
+from threading import Thread
 
 from django.conf import settings
 from django.contrib.auth import login, logout
-from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, reverse
@@ -81,6 +79,10 @@ def ques_util(request, context):
 
 @verification_required
 def ques(request):
+    contest = Contest.objects.get()
+    if contest.start_time > timezone.now():
+        return render(request, 'contest/countdown.html', {'start_time': contest.start_time - timezone.now()})
+
     context = {}
     if request.method == 'POST':
         if handle_answer(request):
@@ -291,4 +293,3 @@ def read_message(request):
     if message and not message[0].seen:
         message[0].seen = True
         message[0].save()
-
