@@ -36,22 +36,22 @@ class Question(models.Model):
     def __str__(self):
         return f"Question {self.number}"
 
-    def time_since(self):
-        diff = timezone.now() - self.release_date
-        if diff.days > 0:
-            return f'{diff.days} days'
-        elif diff.seconds > 3600:
-            hours = diff.seconds // 3600
-            ret = f'{hours} hour'
-            if hours != 1:
-                return ret + 's'
-            return ret
-        else:
-            minutes = diff.seconds // 60
-            ret = f'{minutes} minute'
-            if minutes != 1:
-                return ret + 's'
-            return ret
+    # def time_since(self):
+    #     diff = timezone.now() - self.release_date
+    #     if diff.days > 0:
+    #         return f'{diff.days} days'
+    #     elif diff.seconds > 3600:
+    #         hours = diff.seconds // 3600
+    #         ret = f'{hours} hour'
+    #         if hours != 1:
+    #             return ret + 's'
+    #         return ret
+    #     else:
+    #         minutes = diff.seconds // 60
+    #         ret = f'{minutes} minute'
+    #         if minutes != 1:
+    #             return ret + 's'
+    #         return ret
 
 
 class CustomManager(UserManager):

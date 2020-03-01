@@ -147,7 +147,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 # AUTH_USER_MODEL='contest.User'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
 MEDIA_URL = '/media/'
 
 CONTEST_SENDER_EMAIL = "nd.ojass@nitjsr.ac.in"
