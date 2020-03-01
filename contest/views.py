@@ -141,6 +141,7 @@ def signup(request):
         if form.is_valid():
             contestant = form.save()
             contestant.is_active = False
+            contestant.last_answered = Contest.objects.get().start_time
             contestant.save()
             login(request, contestant)
             act = ActivationModel.objects.create(contestant=contestant)
@@ -192,6 +193,7 @@ def verify_view(request):
             if model:
                 contestant = model[0].contestant
                 contestant.is_active = True
+                # Everyone should start with the same last_answered
                 contestant.save()
                 return HttpResponseRedirect(reverse('contest:question'))
 

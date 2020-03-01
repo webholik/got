@@ -19,7 +19,7 @@ class MessageInline(admin.TabularInline):
 class MyUserAdmin(admin.ModelAdmin):
     inlines = [AnswerInLine, MessageInline]
     list_display = ['username', 'name', 'email', 'college', 'points', 'extra_time']
-    fields = ['username', 'name', 'email', 'college', 'points', 'extra_time', 'answered_questions']
+    fields = ['username', 'name', 'email', 'college', 'points', 'extra_time', 'is_active', 'answered_questions']
     filter_horizontal = ['answered_questions']
     # readonly_fields = ['answered_questions']
     search_fields = ['username', 'first_name', 'last_name', 'email']
@@ -28,7 +28,7 @@ class MyUserAdmin(admin.ModelAdmin):
 # Register your models here.
 class HintInline(admin.TabularInline):
     model = Hint
-    extra = 2
+    extra = 3
 
 
 @admin.register(Question)

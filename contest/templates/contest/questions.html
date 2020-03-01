@@ -34,6 +34,9 @@
                         </div>
                         <div class="card-body ">
                             <h1>{{ question.text }}</h1>
+                        {% if question.image %}
+                            <img src="{{ question.image.url }}">
+                            {% endif %}
                             {% if solved %}
                                 <p><span style="color:green">✔ </span>Answered</p>
                             {% else %}
