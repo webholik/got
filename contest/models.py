@@ -91,7 +91,7 @@ class Contestant(AbstractBaseUser):
     date_joined = models.DateTimeField(default=timezone.now)
 
     college = models.CharField(max_length=100)
-    points = models.IntegerField(default=0)
+    points = models.IntegerField(default=0, db_index=True)
     extra_time = models.DurationField(default=timedelta(0))
     answered_questions = models.ManyToManyField(Question, blank=True)
     last_answered = models.DateTimeField(default=timezone.now)
