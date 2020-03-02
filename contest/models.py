@@ -26,7 +26,7 @@ class Contest(models.Model):
 
 
 class Question(models.Model):
-    number = models.IntegerField()
+    number = models.IntegerField(db_index=True)
     text = models.TextField(max_length=1500)
     image = models.ImageField(blank=True)
     correct_answer = models.CharField(max_length=500)
@@ -69,14 +69,16 @@ class Contestant(AbstractBaseUser):
         validators=[UnicodeUsernameValidator()],
         error_messages={
             'unique': 'A contestant with that username already exists'
-        }
+        },
+        db_index=True,
     )
 
     email = models.EmailField(
         unique=True,
         error_messages={
             'unique': 'A contestant with that email already exists'
-        }
+        },
+        db_index=True,
     )
 
     name = models.CharField(max_length=100)
@@ -171,7 +173,7 @@ def generate_random_string():
 
 
 class AbstractHashModel(models.Model):
-    hash = models.CharField(default=generate_random_string, max_length=30)
+    hash = models.CharField(default=generate_random_string, max_length=30, db_index=True)
     contestant = models.ForeignKey(Contestant, on_delete=models.CASCADE)
 
     def __str__(self):
