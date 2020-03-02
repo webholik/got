@@ -18,8 +18,8 @@ class MessageInline(admin.TabularInline):
 @admin.register(Contestant)
 class MyUserAdmin(admin.ModelAdmin):
     inlines = [AnswerInLine, MessageInline]
-    list_display = ['username', 'name', 'email', 'college', 'points', 'extra_time']
-    fields = ['username', 'name', 'email', 'college', 'points', 'extra_time', 'is_active', 'answered_questions']
+    list_display = ['username', 'name', 'email', 'phone', 'college', 'points', 'extra_time']
+    fields = ['username', 'name', 'email', 'phone', 'college', 'points', 'extra_time', 'is_active', 'answered_questions']
     filter_horizontal = ['answered_questions']
     # readonly_fields = ['answered_questions']
     search_fields = ['username', 'first_name', 'last_name', 'email']

@@ -85,9 +85,9 @@ class AnswerForm(forms.ModelForm):
 
 class LoginForm(forms.Form):
     username = forms.CharField(
-        label='Username',
+        label='Username/Email address',
         widget=forms.TextInput(
-            attrs={'autofocus': True, 'autocapitalize': 'none', 'autocomplete': 'username', 'placeholder': 'Username'})
+            attrs={'autofocus': True, 'autocapitalize': 'none', 'autocomplete': 'username', 'placeholder': 'Username / Email address'})
     )
 
     password = forms.CharField(
@@ -105,6 +105,9 @@ class LoginForm(forms.Form):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
         if username is not None and password is not None:
+            is_email = Contestant.objects.filter(email=username)
+            if is_email:
+                username = is_email[0]
             self.user = authenticate(self.request, username=username, password=password)
             if not self.user:
                 raise forms.ValidationError(
