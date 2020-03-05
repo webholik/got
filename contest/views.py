@@ -10,11 +10,12 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, reverse
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .forms import NewUserForm, AnswerForm, LoginForm, PasswordResetForm
 from .models import Question, Answer, Contestant, ActivationModel, Contest, PasswordResetModel, Message
-from .utils import verification_required
+from .utils import verification_required, send_mail
 
 logger = logging.getLogger('got')
 
@@ -296,3 +297,15 @@ def read_message(request):
     if message and not message[0].seen:
         message[0].seen = True
         message[0].save()
+
+
+@csrf_exempt
+def send_email_to(request):
+    name = request.POST.get('name')
+    email = request.POST.get('email')
+    message = request.POST.get('message')
+    if name and email and message:
+        send_mail('LifeofPy contact mail from ' + name, 'nd.ojass@nitjsr.ac.in', message, sender=email)
+
+    print(request.headers)
+    return HttpResponseRedirect('http://lifeofpy.neodrishti.live')

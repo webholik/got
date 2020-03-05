@@ -32,13 +32,13 @@ def process_messages(request):
     return ret
 
 
-def send_mail(subject, recipient, body, html_body=None):
+def send_mail(subject, recipient, body, html_body=None, sender=settings.CONTEST_SENDER_EMAIL):
     client = SocketLabsClient(int(settings.SERVER_ID), settings.INJECTION_API_KEY)
     message = BasicMessage()
     message.subject = subject
     message.html_body = html_body
     message.plain_text_body = body
-    message.from_email_address = EmailAddress(settings.CONTEST_SENDER_EMAIL)
+    message.from_email_address = EmailAddress(sender)
     message.to_email_address.append(EmailAddress(recipient))
     response = client.send(message)
     if response.result.name != 'Success':
